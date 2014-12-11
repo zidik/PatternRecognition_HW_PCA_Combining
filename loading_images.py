@@ -1,21 +1,23 @@
 __author__ = 'Mark Laane'
 
-import numpy
-import cv2
 import os
 import errno
+
+import numpy
+import cv2
+
 
 def extract_color_channels(all_face_vectors):
     try:
         number_of_channels = all_face_vectors.shape[2]
     except IndexError:
         # Only one channel vectors were returned
-        number_of_channels = 1
         color_channels = numpy.array([all_face_vectors])
     else:
         # Array contains multiple channels, let's separate them
         color_channels = numpy.squeeze(numpy.dsplit(all_face_vectors, number_of_channels), 2)
     return color_channels
+
 
 def load_face_vectors_from_disk(image_numbers, img_size, load_channels_bgrhs=False, show=True):
     """
@@ -65,14 +67,14 @@ def load_face_vectors_from_disk(image_numbers, img_size, load_channels_bgrhs=Fal
             cv2.waitKey(1)
 
         if not load_channels_bgrhs:
-            #Use grayscale:
+            # Use grayscale:
             resized = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-            vector_shape = (img_size[0]*img_size[1])
+            vector_shape = (img_size[0] * img_size[1])
         else:
-            #bgr and hs
+            # bgr and hs
             hsv = cv2.cvtColor(resized, cv2.COLOR_BGR2HSV)
             resized = numpy.dstack((resized, hsv[:, :, :2]))
-            vector_shape = (img_size[0]*img_size[1], 5)
+            vector_shape = (img_size[0] * img_size[1], 5)
 
         vector = resized.reshape(vector_shape)
 
@@ -99,7 +101,7 @@ def detect_one_face(image):
     if number_of_faces == 0:
         raise UserWarning("No face was found on image")
     elif number_of_faces == 1:
-        #One face was found
+        # One face was found
         x, y, w, h = faces[0]
     else:
         raise UserWarning("Multiple faces were found on image")
