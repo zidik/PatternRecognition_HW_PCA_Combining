@@ -42,7 +42,7 @@ def test_different_training(color_channels, no_of_persons, samples_person, combi
     x_min = 1
     x_max = samples_person-1
     number_of_diff_trainings = x_max+1 - x_min
-    number_of_tests = 10
+    number_of_tests = 15
     number_of_results = 3
     plot_recognition_rate = numpy.empty((number_of_results, number_of_tests*number_of_diff_trainings))
     count = 0
