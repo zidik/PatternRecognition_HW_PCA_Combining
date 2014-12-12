@@ -2,12 +2,13 @@ __author__ = 'Mark'
 from scipy import stats
 
 
-def combine_majority_vote(predictions, _ ):
+def combine_majority_vote(predictions):
     majority_vote_predictions = (stats.mode(predictions[:, :, 0])[0])[0]
     return majority_vote_predictions.astype(int)
 
 
-def combine_minimum_rule(predictions, total_testing_samples):
+def combine_minimum_rule(predictions):
+    total_testing_samples = predictions.shape[1]
     all_minimum_distances = [{} for _ in range(total_testing_samples)]
     for classifier_predictions in predictions:
         for sample_minimum_distances, (class_no, distance) in zip(all_minimum_distances, classifier_predictions):
@@ -22,7 +23,8 @@ def combine_minimum_rule(predictions, total_testing_samples):
     return min_rule_prediction
 
 
-def combine_mean_rule(predictions, total_testing_samples):
+def combine_mean_rule(predictions):
+    total_testing_samples = predictions.shape[1]
     all_distances = [{} for _ in range(total_testing_samples)]
     for classifier_predictions in predictions:
         for sample_distances, (class_no, distance) in zip(all_distances, classifier_predictions):

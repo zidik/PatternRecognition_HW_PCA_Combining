@@ -17,7 +17,6 @@ def main():
 
     no_of_persons = 13  # Number of persons
     samples_person = 10  # Number of samples per person
-    samples_training = 9
     image_size = (50, 50)  # All face images will be resized to this
 
     combining_functions = [
@@ -26,31 +25,28 @@ def main():
         (combine_mean_rule, "Mean Rule")
     ]
 
-
     all_image_numbers = generate_all_image_numbers(no_of_persons, samples_person)
     all_face_vectors = load_face_vectors_from_disk(all_image_numbers, image_size, load_channels_bgrhs=True)
     color_channels = extract_color_channels(all_face_vectors)
 
     test_different_training(color_channels, no_of_persons, samples_person, combining_functions)
 
-    #results = train_and_test(color_channels, no_of_persons, samples_person, samples_training)
-    #logging.debug(str(results))
-
 
 def test_different_training(color_channels, no_of_persons, samples_person, combining_functions):
     plot_number_of_training_samples = []
     x_min = 1
-    x_max = samples_person-1
-    number_of_diff_trainings = x_max+1 - x_min
+    x_max = samples_person - 1
+    number_of_diff_trainings = x_max + 1 - x_min
     number_of_tests = 15
     number_of_results = 3
-    plot_recognition_rate = numpy.empty((number_of_results, number_of_tests*number_of_diff_trainings))
+    plot_recognition_rate = numpy.empty((number_of_results, number_of_tests * number_of_diff_trainings))
     count = 0
     for test_no in range(number_of_tests):
         sys.stdout.write("\r%d%%" % (test_no * 100 // number_of_tests))
         sys.stdout.flush()
-        for samples_training in range(x_min, x_max+1):
-            results = train_and_test(color_channels, no_of_persons, samples_person, samples_training, combining_functions)
+        for samples_training in range(x_min, x_max + 1):
+            results = train_and_test(
+                color_channels, no_of_persons, samples_person, samples_training, combining_functions)
 
             plot_number_of_training_samples.append(samples_training)
             plot_recognition_rate[:, count] = results
@@ -69,7 +65,6 @@ def test_different_training(color_channels, no_of_persons, samples_person, combi
 
 
 def train_and_test(color_channels, no_of_persons, samples_person, samples_training, combining_functions):
-
     # split into training and testing:
     all_testing_idx, all_training_idx = randomly_split_classes(
         no_of_classes=no_of_persons,
@@ -84,7 +79,7 @@ def train_and_test(color_channels, no_of_persons, samples_person, samples_traini
     test_classes = [class_no for class_no in range(no_of_persons) for _ in range(samples_testing)]
     results = []
     for function, function_name in combining_functions:
-        combined_predictions = function(predictions, samples_testing * no_of_persons)
+        combined_predictions = function(predictions)
         right_classification = numpy.equal(combined_predictions, test_classes)
         prediction_rate = numpy.count_nonzero(right_classification) / right_classification.size
         logging.debug(
@@ -92,6 +87,7 @@ def train_and_test(color_channels, no_of_persons, samples_person, samples_traini
         results.append(prediction_rate)
 
     return results
+
 
 def show_vectors_as_images(vectors: numpy.ndarray, image_size, wait_time=None):
     for i, vector in enumerate(vectors):
